@@ -202,7 +202,7 @@ class CheckoutView(View):
                         self.request, "Invalid payment option selected")
                     return redirect('core:checkout')
         except ObjectDoesNotExist:
-            messages.warning(self.request, "You do not have an active order")
+            messages.warning(self.request, message="You do not have an active order")
             return redirect("core:order-summary")
 
 
@@ -332,16 +332,16 @@ class PaymentView(View):
                 # Display a very generic error to the user, and maybe send
                 # yourself an email
                 messages.warning(
-                    self.request, "Something went wrong. You were not charged. Please try again.")
+                    self.request, message="Something went wrong. You were not charged. Please try again.")
                 return redirect("/")
 
             except Exception as e:
                 # send an email to ourselves
                 messages.warning(
-                    self.request, "A serious error occurred. We have been notifed.")
+                    self.request, message="A serious error occurred. We have been notifed.")
                 return redirect("/")
 
-        messages.warning(self.request, "Invalid data received")
+        messages.warning(self.request, message="Invalid data received")
         return redirect("/payment/stripe/")
 
 
@@ -360,7 +360,7 @@ class OrderSummaryView(LoginRequiredMixin, View):
             }
             return render(self.request, 'order_summary.html', context)
         except ObjectDoesNotExist:
-            messages.warning(self.request, "You do not have an active order")
+            messages.warning(self.request, message="You do not have an active order")
             return redirect("/")
 
 
@@ -384,18 +384,18 @@ def add_to_cart(request, slug):
         if order.items.filter(item__slug=item.slug).exists():
             order_item.quantity += 1
             order_item.save()
-            messages.info(request, "This item quantity was updated.")
+            messages.info(request, message="This item quantity was updated.")
             return redirect("core:order-summary")
         else:
             order.items.add(order_item)
-            messages.info(request, "This item was added to your cart.")
+            messages.info(request, message="This item was added to your cart.")
             return redirect("core:order-summary")
     else:
         ordered_date = timezone.now()
         order = Order.objects.create(
             user=request.user, ordered_date=ordered_date)
         order.items.add(order_item)
-        messages.info(request, "This item was added to your cart.")
+        messages.info(request, message="This item was added to your cart.")
         return redirect("core:order-summary")
 
 
@@ -417,13 +417,13 @@ def remove_from_cart(request, slug):
             )[0]
             order.items.remove(order_item)
             order_item.delete()
-            messages.info(request, "This item was removed from your cart.")
+            messages.info(request, message="This item was removed from your cart.")
             return redirect("core:order-summary")
         else:
-            messages.info(request, "This item was not in your cart")
+            messages.info(request, message="This item was not in your cart")
             return redirect("core:product", slug=slug)
     else:
-        messages.info(request, "You do not have an active order")
+        messages.info(request, mesage="You do not have an active order")
         return redirect("core:product", slug=slug)
 
 
